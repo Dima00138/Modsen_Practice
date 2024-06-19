@@ -1,0 +1,26 @@
+{
+  "name": "meetups",
+  "version": "1.0.0",
+  "description": "1. Получение списка всех митапов; 2. Получение определённого митапа по его Id; 3. Регистрация нового митапа; 4. Изменение информации о существующем митапе; 5. Удаление митапа.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "npx ts-node index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dima00138/Modsen_Practice.git"
+  },
+  "author": "Dima00138",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dima00138/Modsen_Practice/issues"
+  },
+  "homepage": "https://github.com/Dima00138/Modsen_Practice#readme",
+  "dependencies": {
+    "@prisma/client": "^5.15.1",
+    "express": "^4.19.2",
+    "joi": "^17.13.2",
+    "passport": "^0.7.0",
+    "prisma": "^5.15.1"
+  }
+}

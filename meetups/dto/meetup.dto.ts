@@ -1,13 +1,13 @@
 const Joi = require('joi');
 
 const meetupScheme = Joi.object({
-    title: Joi.string().alphanum(),
-    description: Joi.string(),
+    title: Joi.string().required(),
+    description: Joi.string().required(),
     tags: Joi.array().items(
-        Joi.string()
+        Joi.string().required()
     ),
-    time: Joi.date(),
-    location: Joi.string().uri()
+    time: Joi.string().isoDate().required(),
+    location: Joi.string().uri().required()
 })
 
 export default meetupScheme;

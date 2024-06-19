@@ -53,16 +53,15 @@ router.post('/meetups', validationMeetup, async (req, res) => {
 
 router.put("/meetups/:id", validationMeetup, async (req, res) => {
     const { id } = req.params;
-    const { title, description, tags, time, location } = req.body;
     try {
         const updatedMeetup = await prisma.meetup.update({
             where: { id: Number(id) },
             data: {
-            title,
-            description,
-            tags: tags.split(","),
-            time,
-            location,
+                title: req.body.title,
+                description: req.body.description,
+                tags: req.body.tags,
+                time: req.body.time,
+                location: req.body.location,
             },
         });
         res.json(updatedMeetup);

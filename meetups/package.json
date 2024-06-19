@@ -18,6 +18,8 @@
   "homepage": "https://github.com/Dima00138/Modsen_Practice#readme",
   "dependencies": {
     "@prisma/client": "^5.15.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "joi": "^17.13.2",
     "passport": "^0.7.0",

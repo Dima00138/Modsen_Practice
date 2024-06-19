@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const meetUp = Joi.object({
+const meetupScheme = Joi.object({
     title: Joi.string().alphanum(),
     description: Joi.string(),
     tags: Joi.array().items(

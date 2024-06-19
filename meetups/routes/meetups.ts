@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
+import validationMeetup from "../middleware/validation.middleware";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -9,6 +10,7 @@ router.get("/meetups", async (req, res) => {
         const meetups = await prisma.meetup.findMany();
         res.json(meetups);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Error fetching meetups" });
     }
 });
@@ -22,13 +24,34 @@ router.get("/meetups/:id", async (req, res) => {
 
         if (!meetup) 
             return res.status(404).json({ error: "Meetup not found" });
+
         res.json(meetup);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Error fetching meetup" });
     }
 });
 
-router.put("/meetups/:id", async (req, res) => {
+router.post('/meetups', validationMeetup, async (req, res) => {
+    try {
+      const newMeetup = await prisma.meetup.create({
+        data: {
+          title: req.body.title,
+          description: req.body.description,
+          tags: req.body.tags,
+          time: req.body.time,
+          location: req.body.location,
+        },
+      });
+  
+      res.status(201).json(newMeetup);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to create meetup' });
+    }
+  });
+
+router.put("/meetups/:id", validationMeetup, async (req, res) => {
     const { id } = req.params;
     const { title, description, tags, time, location } = req.body;
     try {
@@ -44,6 +67,7 @@ router.put("/meetups/:id", async (req, res) => {
         });
         res.json(updatedMeetup);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Error updating meetup" });
     }
 });
@@ -56,6 +80,7 @@ router.delete("/meetups/:id", async (req, res) => {
     });
         res.json(deletedMeetup);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Error deleting meetup" });
     }
 });

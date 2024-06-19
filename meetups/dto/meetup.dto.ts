@@ -9,3 +9,5 @@ const meetupScheme = Joi.object({
     time: Joi.date(),
     location: Joi.string().uri()
 })
+
+export default meetupScheme;

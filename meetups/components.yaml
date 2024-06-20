@@ -1,0 +1,20 @@
+components:
+  schemas:
+    Meetup:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        time:
+          type: string
+          format: date-time
+        location:
+          type: string

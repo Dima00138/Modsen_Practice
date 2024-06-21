@@ -5,6 +5,10 @@ import validationMeetup from "../middleware/validation.middleware";
 const router = express.Router();
 const prisma = new PrismaClient();
 
+interface WhereObject {
+    [key: string]: string | number | boolean; // Adjust the types according to your actual data
+  }
+
 /**
  * @openapi
  * /meetups:
@@ -25,8 +29,48 @@ const prisma = new PrismaClient();
  */
 router.get("/meetups", async (req, res) => {
     try {
-        const meetups = await prisma.meetup.findMany();
-        res.json(meetups);
+        const { search, tags, size, page } = req.query;
+        const {sortByTitle, sortByDescription, sortByTime, sortByLocation} = req.query;
+
+        let whereCondition = {};
+        if (search) {
+            whereCondition = {
+                OR: [
+                    { title: { contains: search, mode: 'insensitive' } },
+                    { description: { contains: search, mode: 'insensitive' } },
+                ],
+            };
+        }
+
+        if (tags) {
+            whereCondition = { 
+                ...whereCondition,
+                tags: { hasSome: tags.toString().split(',') }
+            }
+        }
+
+        let orderBy = {};
+        if (sortByTitle) {
+            orderBy = { title: sortByTitle };
+        } else if (sortByDescription) {
+            orderBy = { description: sortByDescription };
+        } else if (sortByTime) {
+            orderBy = { time: sortByTime };
+        } else if (sortByLocation) {
+            orderBy = { location: sortByLocation };
+        }
+
+        const skip = (parseInt(page?.toString()?? "1") - 1) * parseInt(size?.toString()?? "5");
+        const take = parseInt(size?.toString()?? "5");
+
+        const result = await prisma.meetup.findMany({
+            where: whereCondition,
+            orderBy,
+            take,
+            skip,
+        });
+
+        res.json(result);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error fetching meetups" });

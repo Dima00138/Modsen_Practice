@@ -1,15 +1,21 @@
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import { PrismaClient } from "@prisma/client";
-import meetupsRoutes from "./routes/meetups"
+import meetupsRoutes from "./routes/meetups";
+import authorizationRoutes from "./routes/authorization";
+import session from 'express-session';
+import cookieParser from "cookie-parser";
 
 //settings
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
+app.use(express.urlencoded({extended: false}));
+app.use(session({ secret: 'secret-key', resave: false, saveUninitialized: false }));
+
 
 //swagger
 const swaggerOptions = {
@@ -28,6 +34,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 //routes
 app.use(meetupsRoutes);
+app.use(authorizationRoutes);
 
 //setup
 const PORT = process.env.PORT || 3000;

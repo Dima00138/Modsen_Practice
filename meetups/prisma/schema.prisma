@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -21,4 +20,12 @@ model Meetup {
   tags        String[]
   time        DateTime
   location    String
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  password     String
+  refreshToken String    @unique
+  role         String
 }

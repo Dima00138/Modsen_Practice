@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
-import validationMeetup from "../middleware/validation.middleware";
+import {validateMeetup} from "../middleware/validation.middleware";
+import { isAuthenticated } from "../middleware/authentication.middleware";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -141,7 +142,7 @@ router.get("/meetups/:id", async (req, res) => {
  *       500:
  *         description: Failed to create meetup.
  */
-router.post('/meetups', validationMeetup, async (req, res) => {
+router.post('/meetups', isAuthenticated, validateMeetup, async (req, res) => {
     try {
       const newMeetup = await prisma.meetup.create({
         data: {
@@ -190,7 +191,7 @@ router.post('/meetups', validationMeetup, async (req, res) => {
  *       500:
  *         description: Error updating meetup.
  */
-router.put("/meetups/:id", validationMeetup, async (req, res) => {
+router.put("/meetups/:id", isAuthenticated, validateMeetup, async (req, res) => {
     const { id } = req.params;
     try {
         const updatedMeetup = await prisma.meetup.update({
@@ -228,7 +229,7 @@ router.put("/meetups/:id", validationMeetup, async (req, res) => {
  *       500:
  *         description: Error deleting meetup.
  */
-router.delete("/meetups/:id", async (req, res) => {
+router.delete("/meetups/:id", isAuthenticated, async (req, res) => {
     const { id } = req.params;
     try {
         const deletedMeetup = await prisma.meetup.delete({

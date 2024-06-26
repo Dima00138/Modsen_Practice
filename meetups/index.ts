@@ -5,6 +5,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import { PrismaClient } from "@prisma/client";
 import meetupsRoutes from "./routes/meetups";
 import authorizationRoutes from "./routes/authorization";
+import subscribeMeetupRoutes from "./routes/subscribeMeetups";
 import session from 'express-session';
 import cookieParser from "cookie-parser";
 
@@ -35,6 +36,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //routes
 app.use(meetupsRoutes);
 app.use(authorizationRoutes);
+app.use(subscribeMeetupRoutes);
 
 //setup
 const PORT = process.env.PORT || 3000;

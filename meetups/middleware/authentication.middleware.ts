@@ -7,11 +7,11 @@ const prisma = new PrismaClient();
 const refreshSecret = 'refresh-secret';
 
 export const generateAccessToken = (id: number) => {
-    return jwt.sign({ id: id }, accessSecret, { expiresIn: '10m' });
+    return jwt.sign({ id: id }, accessSecret, { expiresIn: "10m" });
 };
   
 export const generateRefreshToken = (id: number) => {
-    return jwt.sign({ id: id }, refreshSecret, { expiresIn: '24h' });
+    return jwt.sign({ id: id }, refreshSecret, { expiresIn: "24h" });
 };
 
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,13 +19,13 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
     const refreshToken = req.cookies.refreshToken;
 
     if (!accessToken && !refreshToken) {
-        return res.status(401).json({error: 'Unauthenticated access'});
+        return res.status(401).json({error: "Unauthorized access"});
     }
 
     if (accessToken) {
         jwt.verify(accessToken, accessSecret, async (err: any, decoded: any) => {
             if (err) {
-                return res.status(401).json({error: 'Unauthenticated access'});
+                return res.status(401).json({error: "Unauthorized access"});
             }
             const user = await prisma.user.findUnique({
                 where: {
@@ -33,16 +33,16 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
                 }
             })
             if (!user) {
-                return res.status(401).json({error: 'Unauthenticated access'});
+                return res.status(401).json({error: "Unauthorized access"});
             }
-            req.user = decoded.id;
+            req.user = user.id;
             next();
         })
     }
-    if (refreshToken) {
+    if (refreshToken && !accessToken) {
         jwt.verify(refreshToken, refreshSecret, async (err: any, decoded: any) => {
             if (err) {
-                return res.status(401).json({error: 'Unauthenticated access'});
+                return res.status(401).json({error: "Unauthorized access"});
             }
             
             const user = await prisma.user.findUnique({
@@ -52,16 +52,40 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
                 }
             })
             if (!user) {
-                return res.status(401).json({error: 'Unauthenticated access'});
+                return res.status(401).json({error: "Unauthorized access"});
             }
             
             const newAccessToken = generateAccessToken(user.id);
-            req.user = decoded.id;
-            res.cookie('accessToken', newAccessToken);
-
+            req.user = user.id;
+            res.cookie("accessToken", newAccessToken);
             next();
           });
     }
 };
 
-export default {isAuthenticated, generateAccessToken, generateRefreshToken};
+export const isPrivileged = async (req: Request, res: Response, next: NextFunction) => {    
+    const user = await prisma.user.findUnique({
+        where: {
+            id: parseInt(req.user?.toString() ?? "0")
+        }
+    })
+
+    if (user?.role !== "admin") {
+        return res.status(401).json({error: 'Unprivileged access'});
+    }
+    if (req.method == "PUT" || req.method == "DELETE") {
+        const { id } = req.params;
+        const meetup = await prisma.meetup.findUnique({
+            where: {
+                id: parseInt(id)
+            }
+        })
+        
+        if (meetup?.userId !== user.id) {
+            return res.status(401).json({error: 'Unprivileged access'});
+        }
+    }
+    next();
+}
+
+export default {isAuthenticated, generateAccessToken, generateRefreshToken, isPrivileged};

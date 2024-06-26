@@ -56,8 +56,8 @@ router.post("/login", validateUser, async (req, res) => {
             data: user
         });
   
-        res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'strict' });
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict'});
+        res.cookie("accessToken", accessToken, { httpOnly: true, sameSite: "strict" });
+        res.cookie("refreshToken", refreshToken, { httpOnly: true, sameSite: "strict"});
   
         res.json(updatedUser);
     } else {
@@ -68,16 +68,17 @@ router.post("/login", validateUser, async (req, res) => {
 /**
  * @swagger
  * /logout:
- *   get:
+ *   post:
  *     summary: Logout user
  *     description: Clear user cookies and refresh token
  *     responses:
  *       200:
  *         description: Successful operation
  */
-router.get("/logout", async (req, res) => {
+router.post("/logout", async (req, res) => {
+    req.user = undefined;
     const refreshToken = req.cookies.refreshToken;
-  
+    
     if (refreshToken) {
         const user = await prisma.user.findUnique({
             where: {
@@ -85,16 +86,18 @@ router.get("/logout", async (req, res) => {
             }
         });
         if (user) {
-            user.refreshToken = "";
+            user.refreshToken = user.username;
             await prisma.user.update({
                 where: {id: user.id},
                 data: user
-            })
+            });
         }
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
-  }
-})
+    }
+    res.clearCookie("connect.sid");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({success: true});
+});
 
 /**
  * @swagger
@@ -130,7 +133,7 @@ router.post('/register', validateUser, async (req, res) => {
          data: {
             username: username,
             password: password,
-            refreshToken: "",
+            refreshToken: username,
             role: "user"
          }
        });

@@ -18,6 +18,8 @@ components:
           format: date-time
         location:
           type: string
+        userId:
+          type: number
     User:
       type: object
       properties:
@@ -28,6 +30,11 @@ components:
         password:
           type: string
         role:
-          type: array
-          items:
-            type: string
+          type: string
+    UserMeetups:
+      type: object
+      properties:
+        userId:
+          type: integer
+        meetupId:
+          type: integer

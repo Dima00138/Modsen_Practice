@@ -20,6 +20,9 @@ model Meetup {
   tags        String[]
   time        DateTime
   location    String
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  registrations UserMeetup[]
 }
 
 model User {
@@ -28,4 +31,15 @@ model User {
   password     String
   refreshToken String    @unique
   role         String
+  meetups      Meetup[]
+  registrations UserMeetup[]
+}
+
+model UserMeetup {
+  userId   Int
+  meetupId Int
+  user     User   @relation(fields: [userId], references: [id])
+  meetup   Meetup @relation(fields: [meetupId], references: [id])
+
+  @@id([userId, meetupId])
 }

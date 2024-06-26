@@ -18,3 +18,16 @@ components:
           format: date-time
         location:
           type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: array
+          items:
+            type: string

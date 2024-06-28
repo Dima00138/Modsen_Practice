@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
 import express from "express";
 import {validateMeetup} from "../middleware/validation.middleware";
 import { isAuthenticated, isPrivileged } from "../middleware/authentication.middleware";
+import { createMeetup, deleteMeetup, getMeetupById, getMeetups, updateMeetup } from "../controllers/meetupController";
 
 const router = express.Router();
-const prisma = new PrismaClient();
+
 
 /**
  * @openapi
@@ -24,55 +24,7 @@ const prisma = new PrismaClient();
  *       500:
  *         description: Error fetching meetups.
  */
-router.get("/meetups", async (req, res) => {
-    try {
-        const { search, tags, size, page } = req.query;
-        const {sortByTitle, sortByDescription, sortByTime, sortByLocation} = req.query;
-
-        let whereCondition = {};
-        if (search) {
-            whereCondition = {
-                OR: [
-                    { title: { contains: search, mode: "insensitive" } },
-                    { description: { contains: search, mode: "insensitive" } },
-                ],
-            };
-        }
-
-        if (tags) {
-            whereCondition = { 
-                ...whereCondition,
-                tags: { hasSome: tags.toString().split(',') }
-            }
-        }
-
-        let orderBy = {};
-        if (sortByTitle) {
-            orderBy = { title: sortByTitle };
-        } else if (sortByDescription) {
-            orderBy = { description: sortByDescription };
-        } else if (sortByTime) {
-            orderBy = { time: sortByTime };
-        } else if (sortByLocation) {
-            orderBy = { location: sortByLocation };
-        }
-
-        const skip = (parseInt(page?.toString()?? "1") - 1) * parseInt(size?.toString()?? "5");
-        const take = parseInt(size?.toString()?? "5");
-
-        const result = await prisma.meetup.findMany({
-            where: whereCondition,
-            orderBy,
-            take,
-            skip,
-        });
-
-        res.json(result);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error fetching meetups" });
-    }
-});
+router.get("/meetups", getMeetups);
 
 /**
  * @openapi
@@ -98,22 +50,7 @@ router.get("/meetups", async (req, res) => {
  *       500:
  *         description: Error fetching meetup.
  */
-router.get("/meetups/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const meetup = await prisma.meetup.findUnique({
-            where: { id: Number(id) },
-        });
-
-        if (!meetup) 
-            return res.status(404).json({ error: "Meetup not found" });
-
-        res.json(meetup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error fetching meetup" });
-    }
-});
+router.get("/meetups/:id", getMeetupById);
 
 /**
  * @openapi
@@ -138,24 +75,7 @@ router.get("/meetups/:id", async (req, res) => {
  *       500:
  *         description: Failed to create meetup.
  */
-router.post('/meetups', isAuthenticated, validateMeetup, isPrivileged, async (req, res) => {    
-    try {  
-        const newMeetup = await prisma.meetup.create({
-            data: {
-            title: req.body.title,
-            description: req.body.description,
-            tags: req.body.tags,
-            time: req.body.time,
-            location: req.body.location,
-            userId: parseInt(req.user?.toString() ?? "0")
-            },
-        });
-        res.status(201).json(newMeetup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to create meetup" });
-    }
-});
+router.post('/meetups', isAuthenticated, validateMeetup, isPrivileged, createMeetup);
 
   /**
  * @openapi
@@ -187,25 +107,7 @@ router.post('/meetups', isAuthenticated, validateMeetup, isPrivileged, async (re
  *       500:
  *         description: Error updating meetup.
  */
-router.put("/meetups/:id", isAuthenticated, validateMeetup, isPrivileged, async (req, res) => {
-    const { id } = req.params;
-    try {
-        const updatedMeetup = await prisma.meetup.update({
-            where: { id: Number(id) },
-            data: {
-                title: req.body.title,
-                description: req.body.description,
-                tags: req.body.tags,
-                time: req.body.time,
-                location: req.body.location,
-            },
-        });
-        res.json(updatedMeetup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error updating meetup" });
-    }
-});
+router.put("/meetups/:id", isAuthenticated, validateMeetup, isPrivileged, updateMeetup);
 
 /**
  * @openapi
@@ -225,18 +127,6 @@ router.put("/meetups/:id", isAuthenticated, validateMeetup, isPrivileged, async 
  *       500:
  *         description: Error deleting meetup.
  */
-router.delete("/meetups/:id", isAuthenticated, isPrivileged, async (req, res) => {
-    const { id } = req.params;
-    try {
-        const deletedMeetup = await prisma.meetup.delete({
-            where: { id: Number(id) },
-    });   
-    res.json(deletedMeetup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error deleting meetup" });
-    }
-});
+router.delete("/meetups/:id", isAuthenticated, isPrivileged, deleteMeetup);
 
 export default router;
-module.exports = router;

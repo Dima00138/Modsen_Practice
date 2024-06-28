@@ -1,10 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { UserRepository } from '../repositories/userRepository';
+import { MeetupRepository } from "../repositories/meetupRepository";
 
-const accessSecret = 'access-secret';
 const prisma = new PrismaClient();
+const meetupRepository = new MeetupRepository();
+const userRepository = new UserRepository();
+const accessSecret = 'access-secret';
 const refreshSecret = 'refresh-secret';
+
 
 export const generateAccessToken = (id: number) => {
     return jwt.sign({ id: id }, accessSecret, { expiresIn: "10m" });
@@ -27,11 +32,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
             if (err) {
                 return res.status(401).json({error: "Unauthorized access"});
             }
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: decoded.id
-                }
-            })
+            const user = await userRepository.getUserById(parseInt(decoded.id));
             if (!user) {
                 return res.status(401).json({error: "Unauthorized access"});
             }
@@ -45,12 +46,7 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
                 return res.status(401).json({error: "Unauthorized access"});
             }
             
-            const user = await prisma.user.findUnique({
-                where: {
-                    refreshToken: refreshToken,
-                    id: decoded.id
-                }
-            })
+            const user = await userRepository.getUserByRefreshToken(refreshToken);
             if (!user) {
                 return res.status(401).json({error: "Unauthorized access"});
             }
@@ -64,22 +60,14 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
 };
 
 export const isPrivileged = async (req: Request, res: Response, next: NextFunction) => {    
-    const user = await prisma.user.findUnique({
-        where: {
-            id: parseInt(req.user?.toString() ?? "0")
-        }
-    })
+    const user = await userRepository.getUserById(parseInt(req.user?.toString() || "0"));
 
     if (user?.role !== "admin") {
         return res.status(401).json({error: 'Unprivileged access'});
     }
     if (req.method == "PUT" || req.method == "DELETE") {
         const { id } = req.params;
-        const meetup = await prisma.meetup.findUnique({
-            where: {
-                id: parseInt(id)
-            }
-        })
+        const meetup = await meetupRepository.getMeetupById(parseInt(id));
         
         if (meetup?.userId !== user.id) {
             return res.status(401).json({error: 'Unprivileged access'});

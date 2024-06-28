@@ -18,14 +18,11 @@
   "homepage": "https://github.com/Dima00138/Modsen_Practice#readme",
   "dependencies": {
     "@prisma/client": "^5.15.1",
-    "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
     "joi": "^17.13.2",
     "jsonwebtoken": "^9.0.2",
-    "passport": "^0.7.0",
     "prisma": "^5.15.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

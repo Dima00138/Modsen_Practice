@@ -74,7 +74,7 @@ export class AuthorizationService {
         return this.updateRefreshToken(userId, userId.toString());
       }
 
-    async register(username: string, password: string): Promise<{ accessToken: string, refreshToken: string }> {
+    async register(username: string, password: string): Promise<User> {
       const user = await this.createUser({
         username: username,
         password: password,
@@ -84,9 +84,23 @@ export class AuthorizationService {
       if (!user) {
         throw new BadRequestException();
       }
-      const tokens = await this.getTokens(user.id, user.username);
-      await this.updateRefreshToken(user.id, tokens.refreshToken);
-      return tokens;
+      return user;
+    }
+
+    async refreshTokens(userId: number, refreshToken: string) {
+      const user = await this.prismaService.user.findUnique({
+          where: {
+              id: userId
+          }
+      });
+
+    if(!user || user.refreshToken == user.id.toString() || user.refreshToken === user.username) 
+      throw new ForbiddenException('Access denied');
+
+    const tokens = await this.getTokens(user.id, user.username);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
     }
 
     async getTokens(userId: number, username: string) {

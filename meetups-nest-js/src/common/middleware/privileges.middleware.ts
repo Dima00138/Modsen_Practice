@@ -10,7 +10,7 @@ export class IsPrivilegedMiddleware implements NestMiddleware {
 		private readonly meetupService: MeetupsService
         ) {}
     async use(req: Request, res: Response, next: NextFunction) {
-      const user = await this.authService.getUserById(parseInt(req.user?.toString() || "0"));
+      const user = await this.authService.getUserById(parseInt(req.user['sub'] || "0"));
 
    		if (user?.role !== "admin") {
         return res.status(401).json({error: 'Unprivileged access'});

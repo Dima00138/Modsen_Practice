@@ -5,7 +5,7 @@ export interface MeetupDto {
     title: string;
     description: string;
     tags: string[];
-    time: string;
+    time: Date;
     location: string;
     userId: number;
 }

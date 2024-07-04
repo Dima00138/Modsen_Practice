@@ -13,9 +13,8 @@ export class IsAuthenticatedMiddleware implements NestMiddleware {
     ) {}
 
     async use(req: Request, res: Response, next: NextFunction) {
-      
         const user = await this.authService.getUserById(parseInt(req.user['sub']));
-        if (!user || !user.refreshToken)
+        if (!user || user.refreshToken == user.id.toString() || user.refreshToken === user.username)
             throw new ForbiddenException('Access Denied');
         }
 }

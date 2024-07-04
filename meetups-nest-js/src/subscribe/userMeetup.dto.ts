@@ -1,10 +1,9 @@
 const Joi = require('joi');
 
-/**
- * @typedef {Object} UserMeetup
- * @property {number} userId - User ID
- * @property {number} meetupId - Meetup ID
- */
+export interface UserMeetupDto {
+    userId: number;
+    meetupId: number;
+}
 
 const userMeetupScheme = Joi.object({
     userId: Joi.number().required(),

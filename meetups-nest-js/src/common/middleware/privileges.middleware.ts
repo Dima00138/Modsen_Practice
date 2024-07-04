@@ -1,13 +1,13 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
 import { AuthorizationService } from "../../authorization/authorization.service";
-import { MeetupsService } from "src/meetups/meetups.service";
+import { MeetupService } from "src/meetups/meetups.service";
 
 @Injectable()
 export class IsPrivilegedMiddleware implements NestMiddleware {
 	constructor(
 		private readonly authService: AuthorizationService,
-		private readonly meetupService: MeetupsService
+		private readonly meetupService: MeetupService
         ) {}
     async use(req: Request, res: Response, next: NextFunction) {
       const user = await this.authService.getUserById(parseInt(req.user['sub'] || "0"));

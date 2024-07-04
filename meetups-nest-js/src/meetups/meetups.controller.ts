@@ -10,15 +10,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { MeetupsService } from './meetups.service';
-import { MeetupDto } from './meetup.dto';
+import { MeetupService } from './meetups.service';
+import { MeetupDto } from './dto/meetup.dto';
+import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 
 @Controller('meetups')
 export class MeetupController {
-  constructor(private readonly meetupService: MeetupsService) {}
+  constructor(private readonly meetupService: MeetupService) {}
 
   @Get()
-  @UseGuards(AuthGuard())
   findAll(
     @Query('search') search: string,
     @Query('tags') tags: string,
@@ -33,25 +33,24 @@ export class MeetupController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard())
   findOne(@Param('id') id: number) {
     return this.meetupService.getMeetupById(id);
   }
 
   @Post()
-  @UseGuards(AuthGuard())
+  @UseGuards(AccessTokenGuard)
   create(@Body() meetupData: MeetupDto) {
     return this.meetupService.createMeetup(meetupData);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AccessTokenGuard)
   update(@Param('id') id: number, @Body() meetupData: MeetupDto) {
     return this.meetupService.updateMeetup(id, meetupData);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AccessTokenGuard)
   remove(@Param('id') id: number) {
     return this.meetupService.deleteMeetup(id);
   }

@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Meetup } from '@prisma/client';
-import meetupScheme from './meetup.dto';
+import meetupScheme from './dto/meetup.dto';
 import { PrismaService } from 'src/database/database.service';
 
 @Injectable()
-export class MeetupsService {
+export class MeetupService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getFilteredMeetups( where: {}, orderBy: {}, take: number, skip: number): Promise<Meetup[]> {

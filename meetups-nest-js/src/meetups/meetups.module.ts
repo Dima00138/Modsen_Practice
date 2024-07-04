@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MeetupsController } from './meetups.controller';
-import { MeetupsService } from './meetups.service';
+import { MeetupController } from './meetups.controller';
+import { MeetupService } from './meetups.service';
 
 @Module({
   imports: [],
-  controllers: [MeetupsController],
-  providers: [MeetupsService],
+  controllers: [MeetupController],
+  providers: [MeetupService],
 })
 export class MeetupModule {}

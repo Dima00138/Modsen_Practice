@@ -1,12 +1,27 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 const Joi = require('joi');
 
-export interface MeetupDto {
+export class MeetupDto {
+    @ApiProperty()
     id: number;
+
+    @ApiProperty()
     title: string;
+
+    @ApiProperty()
     description: string;
+
+    @ApiProperty({ type: [String] })
     tags: string[];
+
+    @ApiProperty()
     time: Date;
+
+    @ApiProperty()
     location: string;
+    
+    @ApiProperty()
     userId: number;
 }
 

@@ -1,10 +1,17 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+
+type JwtPayload = {
+  sub: number;
+  username: string;
+  role: string;
+};
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(Strategy,'jwt-refresh',) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+  private readonly logger = new Logger("RefreshToken");
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -13,8 +20,10 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy,'jwt-refresh
     });
   }
 
-  validate(req: Request, payload: any) {
+  validate(req: Request, payload: JwtPayload) {
     const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
+    this.logger.debug(refreshToken);
+    req.user = payload;
     return { ...payload, refreshToken };
   }
 }

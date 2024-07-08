@@ -1,7 +1,11 @@
+import { ApiProperty } from '@nestjs/swagger';
 import * as Joi from 'joi';
 
-export interface UserDto {
+export class SignInUserDto {
+    @ApiProperty()
     username: string;
+
+    @ApiProperty()
     password: string;
 }
 

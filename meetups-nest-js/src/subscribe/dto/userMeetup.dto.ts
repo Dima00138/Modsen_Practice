@@ -1,7 +1,12 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 const Joi = require('joi');
 
-export interface UserMeetupDto {
+export class UserMeetupDto {
+    @ApiProperty()
     userId: number;
+    
+    @ApiProperty()
     meetupId: number;
 }
 

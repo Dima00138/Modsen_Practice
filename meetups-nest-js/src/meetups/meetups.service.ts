@@ -67,10 +67,13 @@ export class MeetupService {
 }
 
 
-  async createMeetup(data: Partial<Meetup>): Promise<Meetup> {
+  async createMeetup(data: Partial<Meetup>, userId: number): Promise<Meetup> {
     const validData = meetupScheme.validate(data);
     return this.prismaService.meetup.create({
-        data: validData,
+        data: {
+          ...validData.value,
+          userId: userId
+        },
     });
   }
 

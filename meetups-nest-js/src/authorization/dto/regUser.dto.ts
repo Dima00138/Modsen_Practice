@@ -2,7 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 
 const Joi = require('joi');
 
-export class UserDto {
+export class RegUserDto {
+    @ApiProperty()
+    id: number;
+
     @ApiProperty()
     username: string;
 
@@ -16,11 +19,11 @@ export class UserDto {
     role: string;
 }
 
-const userScheme = Joi.object({
+const regUserDto = Joi.object({
     username: Joi.string().required(),
     password: Joi.string().required(),
     refreshToken: Joi.string(),
     role: Joi.string(),
 })
 
-export default userScheme;
+export default regUserDto;

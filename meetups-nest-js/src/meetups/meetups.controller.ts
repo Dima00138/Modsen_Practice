@@ -11,11 +11,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { MeetupService } from './meetups.service';
-import { MeetupDto } from './dto/meetup.dto';
+import { MeetupDto, WorkMeetupDto } from './dto/meetup.dto';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Request } from 'express';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('meetups')
 @Controller('meetups')
@@ -59,8 +59,9 @@ export class MeetupController {
   @Post()
   @Roles(["admin"])
   @UseGuards(AccessTokenGuard)
+  @ApiSecurity("access-token")
   @ApiOperation({ summary: 'Create a new meetup' })
-  @ApiBody({ type: MeetupDto })
+  @ApiBody({ type: WorkMeetupDto })
   @ApiResponse({ status: 201, description: 'The meetup has been successfully created.', type: MeetupDto })
   create(@Body() meetupData: MeetupDto, @Req() req: Request) {
     return this.meetupService.createMeetup(meetupData, req.user['sub']);
@@ -69,16 +70,19 @@ export class MeetupController {
   @Put(':id')
   @Roles(["admin"])
   @UseGuards(AccessTokenGuard)
+  @ApiSecurity("access-token")
   @ApiOperation({ summary: 'Update a meetup' })
   @ApiParam({ name: 'id', required: true, description: 'ID of the meetup to update' })
+  @ApiBody({ type: WorkMeetupDto })
   @ApiResponse({ status: 200, description: 'The meetup has been successfully updated.', type: MeetupDto })
-  update(@Param('id') id: number, @Body() meetupData: MeetupDto) {
+  update(@Param('id') id: number, @Body() meetupData: WorkMeetupDto) {
     return this.meetupService.updateMeetup(id, meetupData);
   }
 
   @Delete(':id')
   @Roles(["admin"])
   @UseGuards(AccessTokenGuard)
+  @ApiSecurity("access-token")
   @ApiOperation({ summary: 'Delete a meetup' })
   @ApiParam({ name: 'id', required: true, description: 'ID of the meetup to delete' })
   @ApiResponse({ status: 204, description: 'The meetup has been successfully deleted.' })

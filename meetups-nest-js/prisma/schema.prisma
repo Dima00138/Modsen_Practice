@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:dima22138@localhost:5432/meetups?schema=public"
 }
 
 model Meetup {

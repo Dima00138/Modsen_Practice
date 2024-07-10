@@ -1,9 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/database/database.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from './users.service';
 import { ApiProperty } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 export class Tokens {
   @ApiProperty()
@@ -18,7 +19,8 @@ export class AuthorizationService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly jwtService: JwtService,
-        private readonly userService: UserService) {}
+        private readonly userService: UserService,
+        private readonly configService: ConfigService) {}
 
    
 
@@ -76,7 +78,7 @@ export class AuthorizationService {
               role: role
             },
             {
-              secret: "access-secret",
+              secret: this.configService.get<string>('REFRESH-SECRET'),
               expiresIn: '15m',
             },
           ),
@@ -87,7 +89,7 @@ export class AuthorizationService {
               role: role
             },
             {
-              secret: "refresh-secret",
+              secret: this.configService.get<string>('ACCESS-SECRET'),
               expiresIn: '3d',
             },
           ),

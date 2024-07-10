@@ -2,6 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 type JwtPayload = {
   sub: number;
@@ -12,18 +13,29 @@ type JwtPayload = {
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   private readonly logger = new Logger("RefreshToken");
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: "refresh-secret",
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        RefreshTokenStrategy.ExtractJWT,
+      ]),
+      secretOrKey: configService.get<string>('REFRESH-SECRET'),
       passReqToCallback: true,
     });
   }
 
+  private static ExtractJWT(req: Request): string | null {
+    if (
+      req.cookies &&
+      'refreshToken' in req.cookies &&
+      req.cookies.refreshToken.length > 0
+    ) {
+      return req.cookies.refreshToken;
+    }
+    return null;
+  }
+
   validate(req: Request, payload: JwtPayload) {
-    const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
-    this.logger.debug(refreshToken);
     req.user = payload;
-    return { ...payload, refreshToken };
+    return payload;
   }
 }

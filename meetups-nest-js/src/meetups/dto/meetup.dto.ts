@@ -25,6 +25,26 @@ export class MeetupDto {
     userId: number;
 }
 
+export class WorkMeetupDto {
+    @ApiProperty()
+    title: string;
+
+    @ApiProperty()
+    description: string;
+
+    @ApiProperty({ type: [String] })
+    tags: string[];
+
+    @ApiProperty()
+    time: Date;
+
+    @ApiProperty()
+    location: string;
+    
+    @ApiProperty()
+    userId: number;
+}
+
 const meetupScheme = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),

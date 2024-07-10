@@ -1,12 +1,10 @@
-import { BadRequestException, Body, Controller, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthorizationService, Tokens } from './authorization.service';
 import { Request, Response } from 'express';
-import userScheme, { UserDto } from './dto/user.dto';
 import { AccessTokenGuard } from 'src/common/guards/accessToken.guard';
 import { RefreshTokenGuard } from 'src/common/guards/refreshToken.guard';
 import { User } from '@prisma/client';
 import { ApiBody, ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import regUserDto, { RegUserDto } from './dto/regUser.dto';
 import signInUser, { SignInUserDto } from './dto/signIn-user.dto';
 
 @ApiTags('authorization')
@@ -23,7 +21,7 @@ export class AuthorizationController {
       const tokens = await this.authService.signIn(validUser.username, validUser.password);
       
       response.cookie('accessToken', tokens.accessToken, {
-        sameSite: 'strict'
+        sameSite: 'strict',
       });
   
       response.cookie('refreshToken', tokens.refreshToken, {

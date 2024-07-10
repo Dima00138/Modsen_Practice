@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { SubscribeModule } from './subscribe/subscribe.module';
 import { MeetupModule } from './meetups/meetups.module';
@@ -9,13 +10,13 @@ import { UserService } from './authorization/users.service';
 import { MeetupService } from './meetups/meetups.service';
 
 @Module({
-  imports: [AuthorizationModule, MeetupModule, SubscribeModule, PrismaModule],
+  imports: [AuthorizationModule, MeetupModule, SubscribeModule, PrismaModule, ConfigModule.forRoot()],
   providers: [UserService, MeetupService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply()
+      .apply(IsPrivilegedMiddleware)
       .forRoutes('*');
   }
 }

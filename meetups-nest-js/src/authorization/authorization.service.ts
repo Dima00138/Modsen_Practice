@@ -5,14 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from './users.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-
-export class Tokens {
-  @ApiProperty()
-  accessToken: string;
-
-  @ApiProperty()
-  refreshToken: string;
-}
+import { Tokens } from './types/tokens';
 
 @Injectable()
 export class AuthorizationService {

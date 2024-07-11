@@ -16,7 +16,7 @@ import { MeetupService } from './meetups/meetups.service';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(IsPrivilegedMiddleware)
+      .apply()
       .forRoutes('*');
   }
 }

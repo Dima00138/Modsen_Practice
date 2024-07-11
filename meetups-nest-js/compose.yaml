@@ -7,20 +7,18 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
+version: '3.9'
+
 services:
   server:
     build:
       context: .
       target: dev
-      args:
-        DATABASE_URL: ${DATABASE_URL}
-        ACCESS-SECRET: ${ACCESS-SECRET}
-        REFRESH-SECRET: ${REFRESH-SECRET}
+    command: npm run start:dev
     environment:
-      NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL}
-      ACCESS-SECRET: ${ACCESS-SECRET}
-      REFRESH-SECRET: ${REFRESH-SECRET}
+      NODE_ENV: development
+    networks:
+      - webnet
     ports:
       - 3000:3000
       - 9229:9229
@@ -39,20 +37,26 @@ services:
   db:
     container_name: pg_db
     image: postgres
+    networks:
+      - webnet
     restart: always
-    user: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
+    # volumes:
+    #   - db-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=meetups
-      - POSTGRES_PASSWORD=Dima22138
-    expose:
-      - 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: meetups
+      POSTGRES_PASSWORD: dima22138
+    # expose:
+    #   - 5432
+    ports:
+      - 5432:5432
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
+networks:
+  webnet:
 volumes:
   db-data:
 

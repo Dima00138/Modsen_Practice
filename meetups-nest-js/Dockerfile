@@ -18,12 +18,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-
-# RUN npm update
 RUN npx prisma generate
-# RUN npx prisma migrate dev
-
-# USER node
 RUN npm run build
 
 ################################################################################
